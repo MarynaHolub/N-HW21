@@ -5,20 +5,21 @@
 // Создайте массив типа `Animal[]`, включающий объекты `Dog` и `Cat`, и вызовите метод `makeSound()` для каждого элемента массива.
 
 abstract class Animal {
-  abstract makeSound(): void;
+  abstract makeSound(): string;
 }
 class Dog extends Animal {
-  makeSound(): void {
-    console.log('Bark');
+  makeSound(): string {
+    return 'Bark'
   }
 }
 class Cat extends Animal {
-  makeSound(): void {
-    console.log('Meow');
+  makeSound(): string {
+    return 'Meow'
   }
 }
 const animals: Animal[] = [new Dog(), new Cat()];
-animals.forEach((animal) => animal.makeSound());
+animals.forEach((animal) => console.log(animal.makeSound()));
+
 
 // Задание 2
 // Абстрактный класс Shape с цветом
@@ -30,17 +31,22 @@ abstract class Shape {
   abstract name: string;
 
   abstract calculateArea(): number;
+
   describe(): void {
-    console.log(`${this.name}: Area = ${this.calculateArea().toFixed(2)}`);
+    console.log(`${this.name}: Area = ${this.calculateArea()}`);
   }
 }
 
 abstract class ColoredShape extends Shape {
   abstract color: string;
+
+    describe(): void {
+    console.log(`${this.color} ${this.name}: Area = ${this.calculateArea()}`);
+  }
 }
 
 class ColoredCircle extends ColoredShape {
-  name: string = 'Colored Circle';
+  name: string = 'colored Circle';
   color: string = 'red';
   constructor(public radius: number) {
     super();
@@ -72,7 +78,7 @@ const shapes: ColoredShape[] = [
   new ColoredRectangle(2, 3),
 ];
 
-shapes.forEach((shape) => console.log(shape.calculateArea()));
+shapes.forEach((shape) => shape.describe())
 
 // Задание 3
 // Абстрактный класс Appliance
@@ -132,14 +138,26 @@ abstract class Account {
   abstract withdraw(amount: number): number;
 }
 class SavingsAccount extends Account {
-  constructor(protected balance: number = 0) {
+  constructor(
+    protected balance: number = 0,
+    public rate: number,
+  ) {
     super();
   }
   deposit(amount: number = 0): number {
-    const procent = 0.05;
-    return (this.balance += amount * procent);
+    return (this.balance += amount);
+  }
+  applyInterest(): number {
+    this.rate = 5;
+    return (this.balance += (this.balance * this.rate) / 100);
   }
   withdraw(amount: number): number {
+    if (amount <= 0) {
+      throw new Error('Amount must be greater than zero');
+    }
+    if (amount > this.balance) {
+      throw new Error('Amount must be less than balance');
+    }
     return (this.balance -= amount);
   }
   get getBalance(): number {
@@ -155,6 +173,12 @@ class CheckingAccount extends Account {
   }
   withdraw(amount: number): number {
     const comission: number = amount * 0.02;
+    if (amount <= 0) {
+      throw new Error('Amount must be greater than zero');
+    }
+    if (amount > this.balance + comission) {
+      throw new Error('Amount must be less than balance + comission');
+    }
     return (this.balance -= amount + comission);
   }
   get getBalance(): number {
@@ -162,19 +186,27 @@ class CheckingAccount extends Account {
   }
 }
 
-const savingAccount = new SavingsAccount(400);
-
+const savingAccount = new SavingsAccount(400, 5);
+console.log('Opening balance SavingsAccount: ', savingAccount.getBalance);
 savingAccount.deposit(300);
-console.log(savingAccount.getBalance);
+console.log('Balance after a deposit: ', savingAccount.getBalance);
+savingAccount.applyInterest();
+console.log(
+  'Balance after interest is accrued on the balance: ',
+  savingAccount.getBalance,
+);
 savingAccount.withdraw(200);
-console.log(savingAccount.getBalance);
+console.log('Balance withdrawal: ', savingAccount.getBalance);
 
 const checkingsAccount = new CheckingAccount(100);
-
+console.log('Opening balance CheckingAccount: ', checkingsAccount.getBalance);
 checkingsAccount.deposit(2000);
-console.log(checkingsAccount.getBalance);
+console.log('Balance after a deposit: ', checkingsAccount.getBalance);
 checkingsAccount.withdraw(400);
-console.log(checkingsAccount.getBalance);
+console.log(
+  'Balance after a cash withdrawal with a fee: ',
+  checkingsAccount.getBalance,
+);
 
 // Задание 5
 // Абстрактный класс Media

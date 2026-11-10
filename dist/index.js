@@ -8,16 +8,16 @@ class Animal {
 }
 class Dog extends Animal {
     makeSound() {
-        console.log('Bark');
+        return 'Bark';
     }
 }
 class Cat extends Animal {
     makeSound() {
-        console.log('Meow');
+        return 'Meow';
     }
 }
 const animals = [new Dog(), new Cat()];
-animals.forEach((animal) => animal.makeSound());
+animals.forEach((animal) => console.log(animal.makeSound()));
 // Задание 2
 // Абстрактный класс Shape с цветом
 // Создайте абстрактный класс `ColoredShape`, который наследует `Shape` (из задания 4 на уроке) и добавляет абстрактное поле `color`.
@@ -25,10 +25,13 @@ animals.forEach((animal) => animal.makeSound());
 // Выведите площадь и цвет для каждого объекта.
 class Shape {
     describe() {
-        console.log(`${this.name}: Area = ${this.calculateArea().toFixed(2)}`);
+        console.log(`${this.name}: Area = ${this.calculateArea()}`);
     }
 }
 class ColoredShape extends Shape {
+    describe() {
+        console.log(`${this.color} ${this.name}: Area = ${this.calculateArea()}`);
+    }
 }
 class ColoredCircle extends ColoredShape {
     radius;
@@ -61,7 +64,7 @@ const shapes = [
     new ColoredCircle(4),
     new ColoredRectangle(2, 3),
 ];
-shapes.forEach((shape) => console.log(shape.calculateArea()));
+shapes.forEach((shape) => shape.describe());
 // Задание 3
 // Абстрактный класс Appliance
 // Создайте абстрактный класс `Appliance` с абстрактными методами `turnOn()` и `turnOff()`.
@@ -107,15 +110,26 @@ class Account {
 }
 class SavingsAccount extends Account {
     balance;
-    constructor(balance = 0) {
+    rate;
+    constructor(balance = 0, rate) {
         super();
         this.balance = balance;
+        this.rate = rate;
     }
     deposit(amount = 0) {
-        const procent = 0.05;
-        return (this.balance += amount * procent);
+        return (this.balance += amount);
+    }
+    applyInterest() {
+        this.rate = 5;
+        return (this.balance += (this.balance * this.rate) / 100);
     }
     withdraw(amount) {
+        if (amount <= 0) {
+            throw new Error('Amount must be greater than zero');
+        }
+        if (amount > this.balance) {
+            throw new Error('Amount must be less than balance');
+        }
         return (this.balance -= amount);
     }
     get getBalance() {
@@ -133,22 +147,32 @@ class CheckingAccount extends Account {
     }
     withdraw(amount) {
         const comission = amount * 0.02;
+        if (amount <= 0) {
+            throw new Error('Amount must be greater than zero');
+        }
+        if (amount > this.balance + comission) {
+            throw new Error('Amount must be less than balance + comission');
+        }
         return (this.balance -= amount + comission);
     }
     get getBalance() {
         return this.balance;
     }
 }
-const savingAccount = new SavingsAccount(400);
+const savingAccount = new SavingsAccount(400, 5);
+console.log('Opening balance SavingsAccount: ', savingAccount.getBalance);
 savingAccount.deposit(300);
-console.log(savingAccount.getBalance);
+console.log('Balance after a deposit: ', savingAccount.getBalance);
+savingAccount.applyInterest();
+console.log('Balance after interest is accrued on the balance: ', savingAccount.getBalance);
 savingAccount.withdraw(200);
-console.log(savingAccount.getBalance);
+console.log('Balance withdrawal: ', savingAccount.getBalance);
 const checkingsAccount = new CheckingAccount(100);
+console.log('Opening balance CheckingAccount: ', checkingsAccount.getBalance);
 checkingsAccount.deposit(2000);
-console.log(checkingsAccount.getBalance);
+console.log('Balance after a deposit: ', checkingsAccount.getBalance);
 checkingsAccount.withdraw(400);
-console.log(checkingsAccount.getBalance);
+console.log('Balance after a cash withdrawal with a fee: ', checkingsAccount.getBalance);
 // Задание 5
 // Абстрактный класс Media
 // Создайте абстрактный класс `Media` с абстрактным методом `play()`.
@@ -158,14 +182,14 @@ class Media {
 }
 class Audio1 extends Media {
     play() {
-        console.log("Playing audio");
+        console.log('Playing audio');
     }
 }
 class Video extends Media {
     play() {
-        console.log("Playing video");
+        console.log('Playing video');
     }
 }
-const medias = [new Audio1, new Video];
-medias.forEach(item => item.play());
+const medias = [new Audio1(), new Video()];
+medias.forEach((item) => item.play());
 //# sourceMappingURL=index.js.map
